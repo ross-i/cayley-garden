@@ -122,8 +122,10 @@
       type="checkbox"
       bind:checked={$ghostMode}
     />
-    Show all elements of S{$n != null ? String.fromCodePoint(0x2080 + $n) : '?'}
-    <!-- {#if $ghostMode && $n === 5}<span class="disabled-note">(edges hidden for S₅)</span>{/if} -->
+    <span class="ghost-label-text">
+      Show all elements of S{$n != null ? String.fromCodePoint(0x2080 + $n) : '?'}
+      {#if $ghostMode && $n === 5}<span class="disabled-note">(edges hidden for S₅)</span>{/if}
+    </span>
   </label>
 
 </div>
@@ -153,6 +155,11 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.875rem;
+  }
+  .ghost-label-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
   }
   .disabled-note {
     color: #888;

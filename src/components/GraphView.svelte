@@ -43,6 +43,7 @@
     if (dragSettleTimer)   { clearTimeout(dragSettleTimer);   dragSettleTimer   = null; }
     if (postGenerateTimer) { clearTimeout(postGenerateTimer); postGenerateTimer = null; }
     if (viewBoxFitTimer)   { clearTimeout(viewBoxFitTimer);   viewBoxFitTimer   = null; }
+    if (stepSettleTimer)   { clearTimeout(stepSettleTimer);   stepSettleTimer   = null; }
     isDragging = false;
     if (colaInstance) { try { colaInstance.stop(); } catch (_) {} }
     colaInstance = d3adaptor(d3)
@@ -67,6 +68,7 @@
   let dragSettleTimer = null;
   let postGenerateTimer = null;
   let viewBoxFitTimer = null;
+  let stepSettleTimer = null;
   let isDragging = false;
 
   // ── Tooltip ───────────────────────────────────────────────────────────────
@@ -106,7 +108,8 @@
   });
 
   onDestroy(() => {
-    if (dragSettleTimer) { clearTimeout(dragSettleTimer); dragSettleTimer = null; }
+    if (dragSettleTimer)  { clearTimeout(dragSettleTimer);  dragSettleTimer  = null; }
+    if (stepSettleTimer)  { clearTimeout(stepSettleTimer);  stepSettleTimer  = null; }
     if (colaInstance) { try { colaInstance.stop(); } catch (_) {} }
   });
 
@@ -351,7 +354,16 @@
       .start(newNodesAdded ? 30 : 0, 0, newNodesAdded ? 30 : 0);
 
     lastVisibleCount = visColaNodes.length;
+
+    // Immediate rough fit when new nodes appear so they're in frame right away.
     if (newNodesAdded) fitViewBox(visColaNodes);
+
+    // Always schedule a deferred fit so the viewBox catches up after cola settles.
+    if (stepSettleTimer) clearTimeout(stepSettleTimer);
+    stepSettleTimer = setTimeout(() => {
+      fitViewBox(lastVisColaNodes);
+      stepSettleTimer = null;
+    }, 500);
   }
 
   // ── ViewBox fitting ──────────────────────────────────────────────────────
@@ -399,7 +411,9 @@
     svg.select('#active-edges').selectAll('*').remove();
     svg.select('#active-nodes').selectAll('*').remove();
     svg.select('#labels').selectAll('*').remove();
-    resetViewBox();
+    // Fit viewBox to the ghost circle so all nodes are visible regardless of radius.
+    const pad = NODE_RADIUS + 16;
+    svg.attr('viewBox', `${cx - r - pad} ${cy - r - pad} ${2*(r+pad)} ${2*(r+pad)}`);
 
     if (groupN !== 5) {
       svg.select('#ghost-edges').selectAll('line.ghost-edge')
@@ -543,11 +557,17 @@
   }
 
   // Returns the ghost-mode circle center and radius.
+  // The radius is the larger of the default viewport-based size and the minimum
+  // needed so adjacent nodes on the circumference don't overlap.
   function ghostCircle() {
+    const factorials = [1, 1, 2, 6, 24, 120];
+    const nodeCount = ($n && $n >= 2 && $n <= 5) ? factorials[$n] : 1;
+    const minR = nodeCount * (NODE_RADIUS * 2 + 4) / (2 * Math.PI);
+    const defaultR = Math.min(width, height) / 2 - NODE_RADIUS - 24;
     return {
       cx: width  / 2,
       cy: height / 2,
-      r:  Math.min(width, height) / 2 - NODE_RADIUS - 24,
+      r:  Math.max(defaultR, minR),
     };
   }
 

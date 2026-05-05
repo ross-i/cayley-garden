@@ -1,5 +1,4 @@
-The app is built with cola.js (https://ialab.it.monash.edu/webcola/)
-+ D3 + Svelte,
+The app is built with cola.js (https://ialab.it.monash.edu/webcola/) + D3 + Svelte,
 with Vite as the server.
 
 On load, the graph has a single node:

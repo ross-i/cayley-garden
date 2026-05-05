@@ -13,13 +13,13 @@
 
 {#if $generationComplete}
   <div class="group-message">
-    You generated: <strong>{groupName}</strong>
+    You generated <strong>{groupName}</strong>
   </div>
 {/if}
 
 <style>
   .group-message {
-    font-size: 1rem;
+    font-size: 1.15rem;
     padding: 0.5rem 0;
   }
 </style>

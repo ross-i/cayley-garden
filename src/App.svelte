@@ -6,21 +6,59 @@
   import CayleyTable   from './components/CayleyTable.svelte';
   import GroupMessage  from './components/GroupMessage.svelte';
 
+  import { fade } from 'svelte/transition';
+  import { onMount } from 'svelte';
   import { n, cayleyVisible, visibleNodes, darkMode } from './stores.js';
 
   $: nodeCount = $visibleNodes.filter(nd => nd.active).length;
-
-  // Keep the html[data-theme] attribute in sync so CSS can target it.
   $: document.documentElement.dataset.theme = $darkMode ? 'dark' : 'light';
+
+  let headerLeftEl, toggleEl;
+
+  onMount(() => {
+    let done = false;
+    // Subscribe directly to the store so we run synchronously inside n.set(),
+    // capturing old positions before Svelte's DOM flush (which runs in the next
+    // microtask). Our Promise.resolve().then() queues after that flush.
+    const unsub = n.subscribe(newN => {
+      if (!newN || done) return;
+      done = true;
+
+      const leftBefore = headerLeftEl?.getBoundingClientRect();
+      const togBefore  = toggleEl?.getBoundingClientRect();
+
+      Promise.resolve().then(() => {
+        function animEl(el, before) {
+          if (!el || !before) return;
+          const after = el.getBoundingClientRect();
+          const dx = before.left - after.left;
+          if (Math.abs(dx) < 0.5) return;
+          el.style.transition = 'none';
+          el.style.transform = `translateX(${dx}px)`;
+          el.getBoundingClientRect(); // force reflow
+          el.style.transition = 'transform 0.42s cubic-bezier(0.4, 0, 0.2, 1)';
+          el.style.transform = '';
+          const cleanup = () => { el.style.transition = ''; el.removeEventListener('transitionend', cleanup); };
+          el.addEventListener('transitionend', cleanup);
+        }
+        animEl(headerLeftEl, leftBefore);
+        animEl(toggleEl, togBefore);
+      });
+    });
+    return unsub;
+  });
 </script>
 
-<main>
+<main class:ready={!!$n}>
 
   <!-- ── Top bar ──────────────────────────────────────────────── -->
   <header>
-    <h1>Cayley's Garden</h1>
-    <GroupSelector />
-    <button class="theme-toggle" on:click={() => ($darkMode = !$darkMode)}
+    <div class="header-left" bind:this={headerLeftEl}>
+      <h1>Cayley's Garden</h1>
+      <GroupSelector />
+    </div>
+    <button class="theme-toggle" bind:this={toggleEl}
+            on:click={() => ($darkMode = !$darkMode)}
             title={$darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>
       {#if $darkMode}
         <!-- Sun: click to go light -->
@@ -48,7 +86,7 @@
 
   <!-- ── Main workspace (only shown once a group size is chosen) ── -->
   {#if $n}
-  <div class="workspace">
+  <div class="workspace" in:fade={{ duration: 320, delay: 200 }}>
 
     <!-- Left panel: controls pinned at top, generators scroll below, message at bottom -->
     <aside class="left-panel">
@@ -76,7 +114,7 @@
   {/if}
 
   {#if $n}
-    <footer>{nodeCount} / {[2,6,24,120][$n-2]} elements</footer>
+    <footer in:fade={{ duration: 280, delay: 180 }}>{nodeCount} / {[2,6,24,120][$n-2]} elements</footer>
   {/if}
 
 </main>
@@ -95,7 +133,7 @@
   footer {
     flex-shrink: 0;
     text-align: center;
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     color: #888;
   }
 
@@ -106,8 +144,29 @@
     flex-shrink: 0;
   }
 
-  .theme-toggle {
+  /* Before group selection: center the left group and toggle together. */
+  main:not(.ready) header {
+    justify-content: center;
+  }
+
+  /* After group selection: push the toggle to the far right. */
+  main.ready .theme-toggle {
     margin-left: auto;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-shrink: 0;
+  }
+
+  .header-left h1 {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+
+  .theme-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -123,11 +182,6 @@
   }
   .theme-toggle:hover {
     border-color: currentColor;
-  }
-
-  header h1 {
-    margin: 0;
-    font-size: 1.8rem;
   }
 
   .workspace {

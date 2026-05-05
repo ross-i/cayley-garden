@@ -95,9 +95,7 @@ export const visibleEdges = derived(
 
 // Whether the UI is in dark mode. Initialized from the system preference;
 // the user can override via the toggle in the header.
-export const darkMode = writable(
-  typeof window === 'undefined' || !window.matchMedia('(prefers-color-scheme: light)').matches
-);
+export const darkMode = writable(false);
 
 // Incremented by Controls when the Generate animation finishes its last frame.
 // GraphView watches this to trigger a settle-and-refit pass.

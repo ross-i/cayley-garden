@@ -19,6 +19,8 @@
   const palette = ['#e15759', '#4e79a7', '#f28e2b', '#76b7b2', '#59a14f',
                    '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac'];
 
+  const MAX_GENERATORS = 16;
+
   // Called when a checkbox is toggled.
   // Adds the permutation to $generators with a default color and name,
   // or removes it and cleans up its color/name entries.
@@ -26,10 +28,11 @@
   // @param {boolean} checked
   function toggleGenerator(perm, checked) {
     if (checked) {
+      if ($generators.length >= MAX_GENERATORS) return;
       const usedColors = new Set($generatorColors);
       const color = palette.find(c => !usedColors.has(c)) ?? palette[$generators.length % palette.length];
       const usedNames = new Set($generatorNames);
-      const name = 'abcdefghijklmnopqrstuvwxyz'.split('').find(c => !usedNames.has(c)) ?? 'a';
+      const name = 'abcdfghijklmnopqrstuvwxyz'.split('').find(c => !usedNames.has(c)) ?? 'a';
       const gens = [...$generators, perm];
       const colors = [...$generatorColors, color];
       const names = [...$generatorNames, name];
@@ -75,10 +78,27 @@
     }).filter(Boolean);
   }
 
+  function deselectAll() {
+    generators.set([]);
+    generatorColors.set([]);
+    generatorNames.set([]);
+    frames.set([]);
+    currentFrame.set(0);
+    applied.set(new Set());
+    isStable.set(false);
+  }
+
   // Called when the user edits a generator's name.
-  // @param {number} index  - position in $generators
-  // @param {string} name   - new single-letter name
-  function updateName(index, name) {
+  // Rejects the change (and reverts the input) if another generator already
+  // uses the same non-empty letter, keeping names unique.
+  // @param {number} index     - position in $generators
+  // @param {string} name      - new single-letter name
+  // @param {HTMLElement} el   - the input element (for revert)
+  function updateName(index, name, el) {
+    if (name === 'e' || (name && $generatorNames.some((n, i) => i !== index && n === name))) {
+      el.value = $generatorNames[index];
+      return;
+    }
     const names = [...$generatorNames];
     names[index] = name;
     generatorNames.set(names);
@@ -105,7 +125,7 @@
               class="name-input"
               maxlength="1"
               value={$generatorNames[i]}
-              on:input={(e) => updateName(i, e.target.value)}
+              on:input={(e) => updateName(i, e.target.value, e.target)}
             />
           {/if}
           <span class="label">{toCycleNotation(perm)}</span>
@@ -114,6 +134,12 @@
       {/each}
       {/if}
     </div>
+
+    {#if $generators.length >= 6}
+      <button class="deselect-all-btn" on:click={deselectAll}>
+        Deselect all generators
+      </button>
+    {/if}
 
     <!-- Name-mode toggle -->
     <label class="name-toggle">
@@ -131,6 +157,7 @@
               <input
                 type="checkbox"
                 checked={selectedKeys.has(toKey(perm))}
+                disabled={!selectedKeys.has(toKey(perm)) && $generators.length >= MAX_GENERATORS}
                 on:change={(e) => toggleGenerator(perm, e.target.checked)}
               />
               {toCycleNotation(perm)}
@@ -190,6 +217,20 @@
     grid-template-columns: 1fr 1fr;
     column-gap: 0.5rem;
     padding-left: 1rem;
+  }
+  .deselect-all-btn {
+    align-self: flex-start;
+    font-size: 0.8rem;
+    padding: 0.2em 0.6em;
+    color: #888;
+    background: none;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .deselect-all-btn:hover {
+    color: #e15759;
+    border-color: #e15759;
   }
   .name-toggle {
     display: flex;

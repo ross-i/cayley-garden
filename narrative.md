@@ -112,6 +112,9 @@ as rotating 240 degrees and then flipping?
 Of course, there are many more groups than just the dihedral groups;
 there are lots of symmetries that can be described by groups.
 `
+
+//
+< begin Claude-authored section >
 % TODO: next section. Introduce permutations, permutation groups,
 % Cayley's Theorem
 
