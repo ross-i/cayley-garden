@@ -304,8 +304,7 @@
           {#if src && tgt}
             <line
               x1={src.x} y1={src.y} x2={tgt.x} y2={tgt.y}
-              stroke={heroD3.colors[edge.generatorIndex] ?? '#999'}
-              stroke-width="1.5"
+              stroke={heroD3.colors[edge.generatorIndex] ?? '#666'}
               class="hero-edge"
             />
           {/if}
@@ -435,16 +434,15 @@
   /* Hero edges and nodes use the same style as Tutorial's D3Graph (normal state)
      so the visual is identical at both scales. */
   .hero-edge {
-    stroke-opacity: 0.65;
-    transition: stroke-opacity 0.35s ease;
-  }
-  .hero-tile.hero-visible .hero-edge {
     stroke-opacity: 1;
+    stroke-width: 1.2;
+    vector-effect: non-scaling-stroke;
+    transition: stroke-opacity 0.35s ease;
   }
 
   .hero-node {
-    fill:         rgba(255, 255, 255, 0.12);
-    stroke:       rgba(255, 255, 255, 0.4);
+    fill:         var(--mini-node-fill,   #ccc);
+    stroke:       var(--mini-node-stroke, #666);
     stroke-width: 1.5;
   }
 

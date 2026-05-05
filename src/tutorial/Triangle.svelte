@@ -14,7 +14,7 @@
         x1="250" y1="15" x2="250" y2="490"/>
 
   <!-- rotating group -->
-  <g class="triangle-group" style="transform: rotate({rotDeg}deg); transform-origin: 250px 260px;">
+  <g class="triangle-group" style="transform: rotate({rotDeg}deg); transform-origin: 50% 56.67%;">
     <!--
       {#key flipTick} destroys and recreates this inner group whenever flipTick
       changes, which restarts the CSS animation from frame 0 every time a flip
@@ -22,9 +22,9 @@
     -->
     {#key flipTick}
       <g class="flip-group" class:do-flip={flipTick > 0}>
-        <polygon class="tri-poly" points="250,80 440,393 60,393"/>
+        <polygon class="tri-poly" points="250,64 440,393 60,393"/>
         <g class="vertex-labels" class:labels-visible={$triangleState.labeled}>
-          <text x="250" y="48" class="vlabel">1</text>
+          <text x="250" y="36" class="vlabel">1</text>
           <text x="468" y="393" class="vlabel">2</text>
           <text x="32" y="393" class="vlabel">3</text>
         </g>

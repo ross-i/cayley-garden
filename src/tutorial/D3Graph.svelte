@@ -6,20 +6,20 @@
     { id: '2,0,1', label: 'r',   x: 440, y: 432 },
     { id: '1,2,0', label: 'r²',  x:  60, y: 432 },
     { id: '0,2,1', label: 'f',   x: 250, y: 188 },
-    { id: '1,0,2', label: 'rf',  x: 348, y: 361 },
-    { id: '2,1,0', label: 'r²f', x: 152, y: 361 },
+    { id: '1,0,2', label: 'rf',  x: 152, y: 361 },
+    { id: '2,1,0', label: 'r²f', x: 348, y: 361 },
   ];
 
   const EDGES = [
-    { id: '0,1,2->2,0,1:0',  src: '0,1,2', tgt: '2,0,1', gen: 0 },
-    { id: '0,1,2->0,2,1:1',  src: '0,1,2', tgt: '0,2,1', gen: 1 },
-    { id: '2,0,1->1,2,0:0',  src: '2,0,1', tgt: '1,2,0', gen: 0 },
-    { id: '2,0,1->1,0,2:1',  src: '2,0,1', tgt: '1,0,2', gen: 1 },
-    { id: '0,2,1->2,1,0:0',  src: '0,2,1', tgt: '2,1,0', gen: 0 },
-    { id: '1,2,0->0,1,2:0',  src: '1,2,0', tgt: '0,1,2', gen: 0 },
-    { id: '1,2,0->2,1,0:1',  src: '1,2,0', tgt: '2,1,0', gen: 1 },
-    { id: '1,0,2->0,2,1:0',  src: '1,0,2', tgt: '0,2,1', gen: 0 },
-    { id: '2,1,0->1,0,2:0',  src: '2,1,0', tgt: '1,0,2', gen: 0 },
+    { id: '0,1,2->2,0,1:0',  src: '0,1,2', tgt: '2,0,1', gen: 0 },  // e  → r
+    { id: '0,1,2->0,2,1:1',  src: '0,1,2', tgt: '0,2,1', gen: 1 },  // e  → f
+    { id: '2,0,1->1,2,0:0',  src: '2,0,1', tgt: '1,2,0', gen: 0 },  // r  → r²
+    { id: '2,0,1->2,1,0:1',  src: '2,0,1', tgt: '2,1,0', gen: 1 },  // r  → r²f
+    { id: '0,2,1->1,0,2:0',  src: '0,2,1', tgt: '1,0,2', gen: 0 },  // f  → rf
+    { id: '1,2,0->0,1,2:0',  src: '1,2,0', tgt: '0,1,2', gen: 0 },  // r² → e
+    { id: '1,2,0->1,0,2:1',  src: '1,2,0', tgt: '1,0,2', gen: 1 },  // r² → rf
+    { id: '1,0,2->2,1,0:0',  src: '1,0,2', tgt: '2,1,0', gen: 0 },  // rf → r²f
+    { id: '2,1,0->0,2,1:0',  src: '2,1,0', tgt: '0,2,1', gen: 0 },  // r²f→ f
   ];
 
   const GEN_COLORS = ['#4e79a7', '#e15759'];
@@ -41,21 +41,14 @@
   $: hlNodes = $graphHighlight.nodes;
   $: hlEdges = $graphHighlight.edges;
   $: anyHighlight = hlNodes.size > 0 || hlEdges.size > 0;
-
-  function nodeClass(id) {
-    if (!anyHighlight) return 'normal';
-    return hlNodes.has(id) ? 'highlighted' : 'dimmed';
-  }
-
-  function edgeClass(id) {
-    if (!anyHighlight) return 'normal';
-    return hlEdges.has(id) ? 'highlighted' : 'dimmed';
-  }
 </script>
 
 <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <!-- filterUnits="userSpaceOnUse" prevents the filter region from collapsing
+         to zero on axis-aligned edges (which have a zero-width or zero-height
+         bounding box when objectBoundingBox percentages are used). -->
+    <filter id="glow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="540" height="540">
       <feGaussianBlur stdDeviation="4" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
@@ -80,27 +73,29 @@
       {@const src = nodeMap[edge.src]}
       {@const tgt = nodeMap[edge.tgt]}
       {@const ep = edgeEndpoints(src, tgt)}
-      {@const cls = edgeClass(edge.id)}
       <line
-        class="edge {cls}"
+        class="edge"
+        class:highlighted={anyHighlight && hlEdges.has(edge.id)}
+        class:dimmed={anyHighlight && !hlEdges.has(edge.id)}
         x1={ep.x1}
         y1={ep.y1}
         x2={ep.x2}
         y2={ep.y2}
         stroke={GEN_COLORS[edge.gen]}
         marker-end="url(#arrow-{edge.gen})"
-        filter={cls === 'highlighted' ? 'url(#glow)' : null}
+        filter={anyHighlight && hlEdges.has(edge.id) ? 'url(#glow)' : null}
       />
     {/each}
 
     {#each NODES as node}
-      {@const cls = nodeClass(node.id)}
-      <g class="node {cls}">
+      <g class="node"
+         class:highlighted={anyHighlight && hlNodes.has(node.id)}
+         class:dimmed={anyHighlight && !hlNodes.has(node.id)}>
         <circle
           cx={node.x}
           cy={node.y}
           r="22"
-          filter={cls === 'highlighted' ? 'url(#glow)' : null}
+          filter={anyHighlight && hlNodes.has(node.id) ? 'url(#glow)' : null}
         />
         <text
           x={node.x}

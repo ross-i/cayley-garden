@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import { fade } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
+  import { cubicOut, cubicIn } from 'svelte/easing';
   import { appView } from './stores.js';
   import { stages } from './story.js';
 
@@ -45,12 +46,6 @@
     }
   }
 
-  // ── Component positioning ──────────────────────────────────────────────────
-  // Returns the column this component occupies in the current stage, or null.
-  function pos(comp) {
-    return stage?.show?.[comp] ?? null;
-  }
-
   // ── Copy bubble positioning ────────────────────────────────────────────────
   function copyStyle(cp) {
     if (!cp) return '';
@@ -60,7 +55,7 @@
                  : ['left: 50%;'];
     const vParts = y === 'top'    ? ['top: 3rem;']
                  : y === 'middle' ? ['top: 50%;']
-                 : ['bottom: 3.5rem;'];
+                 : ['bottom: 6rem;'];
     const tx = x === 'center' ? 'translateX(-50%)' : '';
     const ty = y === 'middle' ? 'translateY(-50%)' : '';
     const tf = [tx, ty].filter(Boolean).join(' ');
@@ -100,31 +95,45 @@
   <!-- ── Sticky visual area ── -->
   <div class="visual-stage">
 
-    <!-- Component slots: always in DOM, CSS-transitioned between columns -->
+    <!-- Component slots: always in DOM, CSS-transitioned between columns.
+         Portrait is the exception — it mounts/unmounts with a fly transition
+         so the slide direction is guaranteed. -->
     {#each COMPONENTS as comp (comp)}
-      {@const colPos = pos(comp)}
-      <div class="comp-wrap"
-           class:col-left={colPos === 'left'}
-           class:col-center={colPos === 'center'}
-           class:col-right={colPos === 'right'}
-           class:col-hidden={!colPos}>
-        {#if comp === 'graph'}
-          <D3Graph />
-        {:else if comp === 'portrait'}
-          <div class="portrait-placeholder">
-            <span class="portrait-name">Arthur Cayley</span>
-            <span class="portrait-years">1821 – 1895</span>
+      {@const colPos = stage?.show?.[comp] ?? null}
+      {#if comp === 'portrait'}
+        {#if colPos}
+          <div class="portrait-wrap"
+               in:fly={{ x: 500, duration: 550, easing: cubicOut }}
+               out:fly={{ x: 500, duration: 400, easing: cubicIn }}>
+            <figure class="portrait-figure">
+              <img src="/arthur_cayley.jpg" alt="Arthur Cayley" class="portrait-img" />
+              <figcaption>
+                <span class="portrait-name">Arthur Cayley</span>
+                <span class="portrait-years">1821 – 1895</span>
+              </figcaption>
+            </figure>
           </div>
-        {:else if comp === 'triangle'}
-          <Triangle />
-        {:else if comp === 'table'}
-          <TutorialCayleyTable />
-        {:else if comp === 'balls'}
-          <Balls />
-        {:else if comp === 's4graph'}
-          <S4Graph />
         {/if}
-      </div>
+      {:else}
+        <div class="comp-wrap"
+             class:col-left={colPos === 'left'}
+             class:col-center={colPos === 'center'}
+             class:col-right={colPos === 'right'}
+             class:col-hidden={!colPos && comp !== 'table' && comp !== 's4graph'}
+             class:col-hidden-right={!colPos && (comp === 'table' || comp === 's4graph')}>
+          {#if comp === 'graph'}
+            <D3Graph />
+          {:else if comp === 'triangle'}
+            <Triangle />
+          {:else if comp === 'table'}
+            <TutorialCayleyTable />
+          {:else if comp === 'balls'}
+            <Balls />
+          {:else if comp === 's4graph'}
+            <S4Graph />
+          {/if}
+        </div>
+      {/if}
     {/each}
 
     <!-- Copy bubble — re-keyed on stage change so it fades between stages -->
@@ -235,32 +244,56 @@
   .col-left   { left: var(--col-pad);        opacity: 1; visibility: visible; transition-delay: 0s, 0s, 0s; }
   .col-center { left: calc(50% - var(--col-w) / 2); opacity: 1; visibility: visible; transition-delay: 0s, 0s, 0s; }
   .col-right  { left: calc(100% - var(--col-pad) - var(--col-w)); opacity: 1; visibility: visible; transition-delay: 0s, 0s, 0s; }
-  .col-hidden { left: -40vw; opacity: 0; visibility: hidden; }
+  .col-hidden       { left: -40vw;  opacity: 0; visibility: hidden; }
+  .col-hidden-right { left: 140vw;  opacity: 0; visibility: hidden; }
 
-  /* ── Portrait placeholder ────────────────────────────────────────────────── */
-  .portrait-placeholder {
+  /* Portrait uses flexbox centering instead of transform so in:fly doesn't
+     clobber the translateY(-50%) that comp-wrap normally relies on. */
+  .portrait-wrap {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(100% - var(--col-pad) - var(--col-w));
+    width: var(--col-w);
+    display: flex;
+    align-items: center;
+  }
+
+  /* ── Portrait ───────────────────────────────────────────────────────────── */
+  .portrait-figure {
+    margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    min-height: 260px;
+    gap: 0.75rem;
+  }
+
+  .portrait-img {
+    display: block;
+    width: 100%;
+    max-height: 55vh;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.04);
-    padding: 2rem 1.5rem;
-    text-align: center;
+  }
+
+  .portrait-figure figcaption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
   }
 
   .portrait-name {
-    font-size: 1.15rem;
+    font-size: 1rem;
     font-weight: 600;
-    opacity: 0.85;
     font-style: italic;
+    opacity: 0.85;
   }
 
   .portrait-years {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     opacity: 0.4;
     letter-spacing: 0.05em;
   }
@@ -294,7 +327,7 @@
   .stage-nav {
     position: absolute;
     bottom: 3.5rem;
-    left: 50%;
+    right: 3.5rem;
     transform: translateX(-50%);
     display: flex;
     align-items: center;

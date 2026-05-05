@@ -14,16 +14,16 @@ const ALL_NODES = new Set([E, R, R2, F, RF, R2F]);
 const E_TO_R    = `${E}->${R}:0`;
 const E_TO_F    = `${E}->${F}:1`;
 const R_TO_R2   = `${R}->${R2}:0`;
-const R_TO_RF   = `${R}->${RF}:1`;
-const F_TO_R2F  = `${F}->${R2F}:0`;
+const R_TO_R2F  = `${R}->${R2F}:1`;
+const F_TO_RF   = `${F}->${RF}:0`;
 const R2_TO_E   = `${R2}->${E}:0`;
-const R2_TO_R2F = `${R2}->${R2F}:1`;
-const RF_TO_F   = `${RF}->${F}:0`;
-const R2F_TO_RF = `${R2F}->${RF}:0`;
+const R2_TO_RF  = `${R2}->${RF}:1`;
+const RF_TO_R2F = `${RF}->${R2F}:0`;
+const R2F_TO_F  = `${R2F}->${F}:0`;
 
-const R_EDGES = new Set([E_TO_R, R_TO_R2, R2_TO_E]);        // rotation cycle (blue)
-const F_EDGES = new Set([E_TO_F, R_TO_RF, R2_TO_R2F]);      // flip edges (red)
-const ALL_EDGES = new Set([...R_EDGES, ...F_EDGES, RF_TO_F, R2F_TO_RF]);
+const R_EDGES = new Set([E_TO_R, R_TO_R2, R2_TO_E]);          // rotation cycle (blue)
+const F_EDGES = new Set([E_TO_F, R_TO_R2F, R2_TO_RF]);        // flip edges (red)
+const ALL_EDGES = new Set([...R_EDGES, ...F_EDGES, F_TO_RF, RF_TO_R2F, R2F_TO_F]);
 
 export const animations = {
 
@@ -97,17 +97,25 @@ export const animations = {
   // Absolute (not cumulative) so re-visiting the stage gives the same result.
   highlightR: () => {
     graphHighlight.set({ nodes: new Set([R]), edges: new Set() });
-    triangleState.update(s => ({ ...s, rotation: 120 }));
+    triangleState.update(s => ({ ...s, rotation: 120, showAxis: false }));
   },
 
   // Stage 11: rf path — highlight nodes e→r→rf and the two edges between them;
   // triangle stays at 120° to show the rotation has been applied.
   highlightRFPath: () => {
     graphHighlight.set({
-      nodes: new Set([E, R, RF]),
-      edges: new Set([E_TO_R, R_TO_RF]),
+      nodes: new Set([E, F, RF]),
+      edges: new Set([E_TO_F, F_TO_RF]),
     });
-    triangleState.update(s => ({ ...s, rotation: 120 }));
+    // TODO: multi-stage animation of triangle
+    // 1.) rotate 120, 2.) show vertical axis and flip over it,
+    // 3.) show axis through lower right vertex and flip over it
+    triangleState.update(s => ({
+      ...s,
+      rotation: 120,
+      showAxis: true,
+      flipTick: s.flipTick + 1,
+    }));
   },
 
   // ── Table highlighting ─────────────────────────────────────────────────────

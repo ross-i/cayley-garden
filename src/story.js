@@ -26,8 +26,8 @@ export const stages = [
   // ── 0 ─ Opening ────────────────────────────────────────────────────────────
   {
     id: 'opening',
-    copy: 'Scroll to explore Cayley\'s Garden.',
-    copyPosition: { x: 'center', y: 'bottom' },
+    copy: 'Scroll to explore.',
+    copyPosition: { x: 'left', y: 'middle' },
     show: { graph: 'center' },
     animation: null,
   },
@@ -36,8 +36,8 @@ export const stages = [
   {
     id: 'portrait-in',
     copy: 'A Cayley Graph, named after Arthur Cayley, encodes the abstract structure of a group.',
-    copyPosition: { x: 'center', y: 'bottom' },
-    show: { graph: 'left', portrait: 'right' },
+    copyPosition: { x: 'left', y: 'middle' },
+    show: { graph: 'center', portrait: 'right' },
     animation: 'portraitSlideIn',   // portrait enters from right; graph shifts left
   },
 
@@ -45,7 +45,7 @@ export const stages = [
   {
     id: 'portrait-out',
     copy: null,
-    copyPosition: { x: 'center', y: 'bottom' },
+    copyPosition: { x: 'left', y: 'middle' },
     show: { graph: 'center' },
     animation: 'portraitSlideOut',  // portrait exits right; graph recenters
   },
@@ -53,17 +53,24 @@ export const stages = [
   // ── 3 ─ Nodes and edges ─────────────────────────────────────────────────────
   {
     id: 'nodes-intro',
-    copy: 'The nodes represent the elements of the group.\nThe edges represent the action of one element on another.',
-    copyPosition: { x: 'center', y: 'bottom' },
+    copy: 'The nodes represent the elements of the group.',
+    copyPosition: { x: 'left', y: 'middle' },
     show: { graph: 'center' },
     animation: 'highlightAllNodes',   // all 6 nodes glow to show "these are the elements"
   },
 
+  {
+    id: 'generators-intro-1',
+    copy: 'The edges represent the action of one element on another.',
+    copyPosition: { x: 'left', y: 'middle' },
+    show: { graph: 'center' },
+    animation: 'highlightGeneratorEdges',  // r-edges (blue) and f-edges (red) lit up
+  },
   // ── 4 ─ Generators ──────────────────────────────────────────────────────────
   {
-    id: 'generators-intro',
-    copy: 'However, we are letting only a subset of elements "act" on the others: we have chosen as generators the elements r and f.',
-    copyPosition: { x: 'center', y: 'bottom' },
+    id: 'generators-intro-2',
+    copy: 'Here, we are letting only a subset of elements "act" on the others: we have chosen as generators the elements f (red edges) and r (blue edges).',
+    copyPosition: { x: 'left', y: 'middle' },
     show: { graph: 'center' },
     animation: 'highlightGeneratorEdges',  // r-edges (blue) and f-edges (red) lit up
   },
@@ -72,7 +79,7 @@ export const stages = [
   {
     id: 'abstract',
     copy: 'Of course, this is all rather abstract. These are mere symbols — what could they represent?',
-    copyPosition: { x: 'center', y: 'bottom' },
+    copyPosition: { x: 'left', y: 'middle' },
     show: { graph: 'center' },
     animation: null,
   },
@@ -81,7 +88,7 @@ export const stages = [
   {
     id: 'triangle-in',
     copy: 'D₃ is the dihedral group of symmetries of an equilateral triangle.',
-    copyPosition: { x: 'right', y: 'bottom' },
+    copyPosition: { x: 'right', y: 'middle' },
     show: { triangle: 'left', graph: 'center' },
     animation: 'triangleSlideIn',   // triangle enters from left; graph stays centered
   },
@@ -90,7 +97,7 @@ export const stages = [
   {
     id: 'identity',
     copy: 'e is the identity element — the "do-nothing" symmetry. If we do nothing to the triangle, it looks the same!',
-    copyPosition: { x: 'right', y: 'bottom' },
+    copyPosition: { x: 'right', y: 'middle' },
     show: { triangle: 'left', graph: 'center' },
     animation: 'highlightE',        // highlight node e on graph
   },
@@ -99,7 +106,7 @@ export const stages = [
   {
     id: 'flip',
     copy: 'f represents the "flip" — if we reflect the triangle about the vertical axis, it still looks the same!',
-    copyPosition: { x: 'right', y: 'bottom' },
+    copyPosition: { x: 'right', y: 'middle' },
     show: { triangle: 'left', graph: 'center' },
     animation: 'highlightF',        // highlight node f; show red axis on triangle; animate reflection
   },
@@ -108,7 +115,7 @@ export const stages = [
   {
     id: 'rotation',
     copy: 'r represents rotation — if we rotate the triangle by 120°, it still looks the same!',
-    copyPosition: { x: 'right', y: 'bottom' },
+    copyPosition: { x: 'right', y: 'middle' },
     show: { triangle: 'left', graph: 'center' },
     animation: 'highlightR',        // highlight node r; animate triangle rotating 120° CW
   },
@@ -117,18 +124,18 @@ export const stages = [
   {
     id: 'composing',
     copy: 'By composing these actions, we can create all possible symmetries of the triangle — we can generate the dihedral group.',
-    copyPosition: { x: 'right', y: 'bottom' },
+    copyPosition: { x: 'right', y: 'middle' },
     show: { triangle: 'left', graph: 'center' },
     animation: null,
   },
 
-  // ── 11 ─ Path e → r → rf ────────────────────────────────────────────────────
+  // ── 11 ─ Path e → f → rf ────────────────────────────────────────────────────
   {
     id: 'rf-path',
-    copy: 'For example, rotating by 120° then flipping over the vertical axis is the same as flipping over the axis through the lower-right vertex — even though that action isn\'t one of our generators.',
-    copyPosition: { x: 'right', y: 'bottom' },
+    copy: 'For example, flipping over the vertical axis and then rotating by 120° is the same as flipping over the axis through the lower-right vertex — even though that action isn\'t one of our generators.',
+    copyPosition: { x: 'right', y: 'middle' },
     show: { triangle: 'left', graph: 'center' },
-    animation: 'highlightRFPath',   // trace path e → r → rf on graph; animate on triangle
+    animation: 'highlightRFPath',   // trace path e → f → rf on graph; animate on triangle
   },
 
   // ── 12 ─ Cayley table slides in from the right ─────────────────────────────
@@ -152,7 +159,7 @@ export const stages = [
   // ── 14 ─ Non-abelian ────────────────────────────────────────────────────────
   {
     id: 'nonabelian',
-    copy: 'The dihedral group is non-Abelian — order matters. f and r give r²f, not rf. Can you see that flipping then rotating 120° is the same as rotating 240° then flipping?',
+    copy: 'The dihedral group is non-Abelian — order matters. f and r give r²f, not rf. Can you see that rotating 120° and then flipping is the same as flipping and then rotating 240°?',
     copyPosition: { x: 'center', y: 'bottom' },
     show: { triangle: 'left', graph: 'center', table: 'right' },
     animation: 'highlightTableR2F', // highlight row f, column r, cell r²f
@@ -243,8 +250,8 @@ export const stages = [
   {
     id: 'labeled-flip',
     copy: 'A flip across the vertical axis is (2 3): it swaps vertices 2 and 3, leaving vertex 1 alone.',
-    copyPosition: { x: 'right', y: 'bottom' },
-    show: { triangle: 'center' },
+    copyPosition: { x: 'center', y: 'bottom' },
+    show: { triangle: 'left' },
     animation: 'labeledFlipAxis',   // draw vertical axis on labeled triangle
   },
 
@@ -252,8 +259,8 @@ export const stages = [
   {
     id: 'labeled-rotation',
     copy: 'A rotation is the cycle (1 2 3): it sends 1 → 2, 2 → 3, and 3 → 1.',
-    copyPosition: { x: 'right', y: 'bottom' },
-    show: { triangle: 'center' },
+    copyPosition: { x: 'center', y: 'bottom' },
+    show: { triangle: 'left' },
     animation: 'labeledRotation',   // animate labeled triangle rotating 120° CW
   },
 
@@ -261,8 +268,8 @@ export const stages = [
   {
     id: 'generators-close',
     copy: 'Thus, by choosing the right generators from among the elements of a symmetric group, we can generate any group.',
-    copyPosition: { x: 'right', y: 'bottom' },
-    show: { triangle: 'center' },
+    copyPosition: { x: 'center', y: 'bottom' },
+    show: { triangle: 'left' },
     animation: null,
   },
 
@@ -290,7 +297,7 @@ export const stages = [
     copy: null,
     copyPosition: { x: 'center', y: 'middle' },
     show: {},
-    animation: 'launchApp',         // header fades in; transition to main app
+    animation: null,                 // scroll trigger in handleScroll fires the app transition
   },
 
 ];
