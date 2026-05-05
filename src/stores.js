@@ -53,6 +53,9 @@ export const allEdges = writable(new Map());
 // Reset to false by handleReset.
 export const isStable = writable(false);
 
+// Top-level view: which screen is the user on.
+export const appView = writable('landing'); // 'landing' | 'tutorial' | 'app'
+
 // ── Derived stores ───────────────────────────────────────────────
 
 // All nodes whose ids appear in frames[0..currentFrame], with a reactive

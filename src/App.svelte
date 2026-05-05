@@ -6,9 +6,12 @@
   import CayleyTable   from './components/CayleyTable.svelte';
   import GroupMessage  from './components/GroupMessage.svelte';
 
+  import LandingPage from './LandingPage.svelte';
+  import Tutorial    from './Tutorial.svelte';
+
   import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
-  import { n, cayleyVisible, visibleNodes, darkMode } from './stores.js';
+  import { n, cayleyVisible, visibleNodes, darkMode, appView } from './stores.js';
 
   $: nodeCount = $visibleNodes.filter(nd => nd.active).length;
   $: document.documentElement.dataset.theme = $darkMode ? 'dark' : 'light';
@@ -16,6 +19,8 @@
   let headerLeftEl, toggleEl;
 
   onMount(() => {
+    darkMode.set(window.matchMedia('(prefers-color-scheme: dark)').matches);
+
     let done = false;
     // Subscribe directly to the store so we run synchronously inside n.set(),
     // capturing old positions before Svelte's DOM flush (which runs in the next
@@ -48,6 +53,15 @@
     return unsub;
   });
 </script>
+
+<!-- Tutorial renders first (lower DOM order = lower z-index) so LandingPage sits on top during the transition -->
+{#if $appView === 'tutorial' || $appView === 'transitioning'}
+  <Tutorial />
+{/if}
+{#if $appView === 'landing' || $appView === 'transitioning'}
+  <LandingPage />
+{/if}
+{#if $appView === 'app'}
 
 <main class:ready={!!$n}>
 
@@ -118,6 +132,8 @@
   {/if}
 
 </main>
+
+{/if}
 
 <style>
   main {

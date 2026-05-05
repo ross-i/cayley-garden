@@ -15,7 +15,7 @@
   import { onMount, onDestroy } from 'svelte';
   import * as d3 from 'd3';
   import { d3adaptor } from 'webcola';
-  import { visibleNodes, visibleEdges, ghostMode, generatorColors, n, fitSignal, viewBoxFitSignal } from '../stores.js';
+  import { visibleNodes, visibleEdges, ghostMode, generatorColors, generators, n, fitSignal, viewBoxFitSignal } from '../stores.js';
   import { buildGhostGraph, circleLayout } from '../lib/cayley.js';
 
   let svgEl;
@@ -100,14 +100,38 @@
 
   // ── Lifecycle ────────────────────────────────────────────────────────────
 
+  // Shift+E: export current node positions to the console as a pasteable JS object.
+  // Only works in normal (non-ghost) mode since cola provides the positions.
+  // Usage: arrange the graph to your liking, then press Shift+E and copy the
+  // console output into a baked-positions constant in the tutorial components.
+  function handleKeydown(e) {
+    if (!e.shiftKey || e.key !== 'E') return;
+    const tag = document.activeElement?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if ($ghostMode || colaNodes.length === 0) {
+      console.warn('Position export only available in normal (non-ghost) mode.');
+      return;
+    }
+    const posById = new Map(colaNodes.map(cn => [cn._id, { x: Math.round(cn.x), y: Math.round(cn.y) }]));
+    const out = {};
+    for (const nd of $visibleNodes.filter(v => v.active)) {
+      const pos = posById.get(nd.id);
+      if (pos) out[nd.id] = { ...pos, label: nd.label };
+    }
+    console.log(`// n=${$n} | generators: ${JSON.stringify($generators)}`);
+    console.log(JSON.stringify(out, null, 2));
+  }
+
   onMount(() => {
     const rect = svgEl.getBoundingClientRect();
     if (rect.width  > 0) width  = rect.width;
     if (rect.height > 0) height = rect.height;
     initSvg();
+    window.addEventListener('keydown', handleKeydown);
   });
 
   onDestroy(() => {
+    window.removeEventListener('keydown', handleKeydown);
     if (dragSettleTimer)  { clearTimeout(dragSettleTimer);  dragSettleTimer  = null; }
     if (stepSettleTimer)  { clearTimeout(stepSettleTimer);  stepSettleTimer  = null; }
     if (colaInstance) { try { colaInstance.stop(); } catch (_) {} }
