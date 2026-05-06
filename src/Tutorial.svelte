@@ -181,10 +181,10 @@
     </button>
 
     <!-- Stage id label (dev aid — remove or hide for production) -->
-    <div class="dev-label" aria-hidden="true">
-      {stage?.id ?? ''}
-      {#if stage?.animation}· <em>{stage.animation}</em>{/if}
-    </div>
+    <!-- <div class="dev-label" aria-hidden="true"> -->
+    <!--   {stage?.id ?? ''} -->
+    <!--   {#if stage?.animation}· <em>{stage.animation}</em>{/if} -->
+    <!-- </div> -->
 
   </div><!-- /visual-stage -->
 
