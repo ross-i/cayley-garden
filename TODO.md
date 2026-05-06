@@ -22,3 +22,4 @@ to give cola time to settle, but the next frame appears before the delay is up.
 1. Pop-up message when discovering new group family (toggle-able)
 2. Progress tracker indicates found groups
 3. Cayley table needs more thought
+4. Improve look of selected cell in group selector button
