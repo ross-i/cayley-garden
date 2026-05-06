@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import { cubicOut, cubicIn } from 'svelte/easing';
-  import { appView } from './stores.js';
+  import { appView, d3Visible } from './stores.js';
   import { stages } from './story.js';
 
   import D3Graph            from './tutorial/D3Graph.svelte';
@@ -12,6 +12,11 @@
   import S4Graph            from './tutorial/S4Graph.svelte';
   import { animations }     from './tutorial/animations.js';
   import { clearAll }       from './tutorial/animState.js';
+
+  // ── Visibility gate — Tutorial mounts during 'transitioning' (hidden behind
+  // LandingPage). Animations must not fire until the view is actually 'tutorial'.
+  let tutorialActive = false;
+  $: if ($appView === 'tutorial') tutorialActive = true;
 
   // ── Scroll tracking ────────────────────────────────────────────────────────
   let scrollEl;
@@ -39,7 +44,12 @@
   function handleKeydown(e) {
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
       e.preventDefault();
-      goToStage(Math.min(stages.length - 1, currentIdx + 1));
+      if (currentIdx >= stages.length - 1) {
+        appView.set('app');
+      }
+      else {
+        goToStage(Math.min(stages.length - 1, currentIdx + 1));
+      }
     } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
       e.preventDefault();
       goToStage(Math.max(0, currentIdx - 1));
@@ -90,7 +100,7 @@
   A sticky visual stage stays pinned to the top while an invisible spacer below
   provides the scrollable height. scrollTop / stageHeight = current stage index.
 -->
-<div class="tutorial" bind:this={scrollEl} on:scroll={handleScroll}>
+<div class="tutorial" class:tutorial-active={tutorialActive} bind:this={scrollEl} on:scroll={handleScroll}>
 
   <!-- ── Sticky visual area ── -->
   <div class="visual-stage">
@@ -122,7 +132,7 @@
              class:col-hidden={!colPos && comp !== 'table' && comp !== 's4graph'}
              class:col-hidden-right={!colPos && (comp === 'table' || comp === 's4graph')}>
           {#if comp === 'graph'}
-            <D3Graph />
+            <D3Graph visible={$d3Visible} />
           {:else if comp === 'triangle'}
             <Triangle />
           {:else if comp === 'table'}
@@ -137,7 +147,7 @@
     {/each}
 
     <!-- Copy bubble — re-keyed on stage change so it fades between stages -->
-    {#if stage?.copy}
+    {#if tutorialActive && stage?.copy}
       {#key currentIdx}
         <div class="copy-bubble"
              style={copyStyle(stage.copyPosition)}
@@ -194,12 +204,14 @@
     inset: 0;
     overflow-y: scroll;
     overflow-x: hidden;
+    scrollbar-width: none;       /* Firefox */
     background: #111;
     color: rgba(255, 255, 255, 0.88);
     --col-w: 30vw;       /* width of each component column */
     --col-pad: 3vw;      /* outer edge padding */
     --gap: 3.5vw;        /* gap between left edge of adjacent columns */
   }
+  .tutorial::-webkit-scrollbar { display: none; } /* Chrome/Safari/Edge */
 
   :global(html[data-theme="light"]) .tutorial {
     background: #f0f0f0;
@@ -337,6 +349,10 @@
     border-radius: 999px;
     padding: 0.35rem 0.75rem;
     user-select: none;
+    opacity: 0;
+  }
+  .tutorial-active .stage-nav {
+    animation: uiFadeIn 0.6s ease 0.3s both;
   }
 
   .nav-btn {
@@ -368,6 +384,10 @@
     right: 0;
     height: 3px;
     background: rgba(255, 255, 255, 0.08);
+    opacity: 0;
+  }
+  .tutorial-active .progress-track {
+    animation: uiFadeIn 0.7s ease 0.4s both;
   }
 
   .progress-fill {
@@ -389,6 +409,15 @@
     border-radius: 6px;
     cursor: pointer;
     transition: color 0.15s, border-color 0.15s;
+    opacity: 0;
+  }
+  .tutorial-active .skip-btn {
+    animation: uiFadeIn 0.6s ease 0.3s both;
+  }
+
+  @keyframes uiFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
   .skip-btn:hover {
     color: rgba(255, 255, 255, 0.85) !important;

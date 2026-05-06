@@ -56,14 +56,18 @@
 
 <!-- Tutorial renders first (lower DOM order = lower z-index) so LandingPage sits on top during the transition -->
 {#if $appView === 'tutorial' || $appView === 'transitioning'}
-  <Tutorial />
+  <div out:fade={{ duration: 350 }}>
+    <Tutorial />
+  </div>
 {/if}
 {#if $appView === 'landing' || $appView === 'transitioning'}
-  <LandingPage />
+  <div out:fade={{ duration: 400 }}>
+    <LandingPage />
+  </div>
 {/if}
 {#if $appView === 'app'}
 
-<main class:ready={!!$n}>
+<main class:ready={!!$n} in:fade={{ duration: 400 }}>
 
   <!-- ── Top bar ──────────────────────────────────────────────── -->
   <header>
@@ -102,13 +106,12 @@
   {#if $n}
   <div class="workspace" in:fade={{ duration: 320, delay: 200 }}>
 
-    <!-- Left panel: controls pinned at top, generators scroll below, message at bottom -->
+    <!-- Left panel: generators scroll, message and controls pinned at bottom -->
     <aside class="left-panel">
-      <Controls />
       <div class="generator-scroll">
         <GeneratorMenu />
       </div>
-      <GroupMessage />
+      <Controls />
     </aside>
 
     <!-- Center: the graph SVG -->
@@ -128,7 +131,10 @@
   {/if}
 
   {#if $n}
-    <footer in:fade={{ duration: 280, delay: 180 }}>{nodeCount} / {[2,6,24,120][$n-2]} elements</footer>
+    <footer in:fade={{ duration: 280, delay: 180 }}>
+      <GroupMessage />
+      {nodeCount} / {[2,6,24,120][$n-2]} elements
+    </footer>
   {/if}
 
 </main>
@@ -219,7 +225,7 @@
   .generator-scroll {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
   .graph-area {

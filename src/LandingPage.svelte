@@ -1,7 +1,8 @@
 <script>
   import { onMount } from 'svelte';
-  import { appView } from './stores.js';
+  import { appView, d3Visible } from './stores.js';
   import { generate } from './lib/cayley.js';
+  import { forceLayout, normalizePosMap } from './lib/layout.js';
 
   const SIZE   = 90;
   const NODE_R = 5;
@@ -50,71 +51,6 @@
     { key: 'A4_S5',     n: 5, gens: [[1,2,0,3,4],[0,2,3,1,4]],     colors: ['#76b7b2','#b07aa1'] },
   ];
 
-  // ── Layout helpers ───────────────────────────────────────────────────
-
-  function normalizePosMap(rawMap, pad = 12) {
-    const entries = [...rawMap.entries()];
-    if (entries.length === 0) return new Map();
-    if (entries.length === 1) return new Map([[entries[0][0], { x: SIZE/2, y: SIZE/2 }]]);
-    const xs = entries.map(([,v]) => v.x), ys = entries.map(([,v]) => v.y);
-    const minX = Math.min(...xs), maxX = Math.max(...xs);
-    const minY = Math.min(...ys), maxY = Math.max(...ys);
-    const rX = maxX - minX || 1, rY = maxY - minY || 1;
-    const usable = SIZE - 2 * pad;
-    const scale  = Math.min(usable / rX, usable / rY);
-    const ox = (SIZE - scale * rX) / 2, oy = (SIZE - scale * rY) / 2;
-    return new Map(entries.map(([id, v]) => [id, {
-      x: ox + (v.x - minX) * scale,
-      y: oy + (v.y - minY) * scale,
-    }]));
-  }
-
-  function forceLayout(nodeIds, edgeList, seed) {
-    const n = nodeIds.length;
-    if (n === 0) return new Map();
-    if (n === 1) return new Map([[nodeIds[0], { x: SIZE/2, y: SIZE/2 }]]);
-    let rng = seed >>> 0;
-    const rand = () => { rng = (Math.imul(1664525, rng) + 1013904223) >>> 0; return rng / 0x100000000; };
-    const pad = 12;
-    const nodes = nodeIds.map(id => ({
-      id, x: pad + rand() * (SIZE - 2*pad), y: pad + rand() * (SIZE - 2*pad), fx: 0, fy: 0,
-    }));
-    const byId = new Map(nodes.map(v => [v.id, v]));
-    const k = Math.sqrt((SIZE - 2*pad) ** 2 / n);
-    const ITERS = Math.max(120, n * 18);
-    for (let iter = 0; iter < ITERS; iter++) {
-      const t = SIZE * 0.13 * (1 - iter / ITERS);
-      for (const v of nodes) { v.fx = 0; v.fy = 0; }
-      for (let i = 0; i < n; i++) for (let j = i+1; j < n; j++) {
-        const a = nodes[i], b = nodes[j];
-        const dx = (b.x - a.x) || 0.01, dy = (b.y - a.y) || 0.01;
-        const d  = Math.sqrt(dx*dx + dy*dy), f = k*k / d;
-        a.fx -= f*dx/d; a.fy -= f*dy/d; b.fx += f*dx/d; b.fy += f*dy/d;
-      }
-      for (const e of edgeList) {
-        const a = byId.get(e.sourceId), b = byId.get(e.targetId);
-        if (!a || !b || a === b) continue;
-        const dx = b.x - a.x, dy = b.y - a.y;
-        const d  = Math.sqrt(dx*dx + dy*dy) || 0.01, f = d*d / k;
-        a.fx += f*dx/d; a.fy += f*dy/d; b.fx -= f*dx/d; b.fy -= f*dy/d;
-      }
-      let cx = 0, cy = 0;
-      for (const v of nodes) {
-        const d = Math.sqrt(v.fx*v.fx + v.fy*v.fy) || 0.001;
-        const move = Math.min(d, t);
-        v.x += v.fx/d * move; v.y += v.fy/d * move;
-        cx += v.x; cy += v.y;
-      }
-      cx /= n; cy /= n;
-      for (const v of nodes) {
-        v.x += (SIZE/2 - cx) * 0.04; v.y += (SIZE/2 - cy) * 0.04;
-        v.x = Math.max(pad, Math.min(SIZE - pad, v.x));
-        v.y = Math.max(pad, Math.min(SIZE - pad, v.y));
-      }
-    }
-    return normalizePosMap(new Map(nodes.map(v => [v.id, { x: v.x, y: v.y }])));
-  }
-
   function makeGraph(cfg, idx) {
     const { key, n, gens, colors } = cfg;
     const { nodes, edges } = generate(n, gens);
@@ -142,8 +78,8 @@
     ['2,0,1', { x: 440, y: 432 }],  // r
     ['1,2,0', { x:  60, y: 432 }],  // r²
     ['0,2,1', { x: 250, y: 188 }],  // f
-    ['1,0,2', { x: 348, y: 361 }],  // rf
-    ['2,1,0', { x: 152, y: 361 }],  // r²f
+    ['1,0,2', { x: 348, y: 361 }],  // rf  — inner left  (matches D3Graph)
+    ['2,1,0', { x: 152, y: 361 }],  // r²f — inner right (matches D3Graph)
   ]);
   const heroD3 = {
     nodeList: d3Graph.nodeList,
@@ -230,9 +166,12 @@
       appView.set('transitioning');         // Tutorial mounts behind LandingPage
       setTimeout(() => {
         animPhase = 3;                      // hero zooms (translate+scale, no fade)
-        // Switch to tutorial once zoom animation completes (1.4 s CSS transition).
-        // LandingPage unmounts; Tutorial's D3Graph is already at the target position.
-        setTimeout(() => appView.set('tutorial'), 1400);
+        // Start D3Graph fade-in (0.75s) 650ms into the 1400ms zoom so it is fully
+        // opaque by the time LandingPage unmounts — no blink at the handoff.
+        setTimeout(() => {
+          d3Visible.set(true);
+          setTimeout(() => appView.set('tutorial'), 750);
+        }, 650);
       }, 1200);
     }, 350);
   }
@@ -431,18 +370,22 @@
     transition: transform 1.4s cubic-bezier(0.15, 0, 0.4, 1);
   }
 
-  /* Hero edges and nodes use the same style as Tutorial's D3Graph (normal state)
-     so the visual is identical at both scales. */
+  /* Hero edges: stroke-width in SVG user units (no vector-effect, so CSS scale()
+     affects it). Start thick (≈1.2px at 90px display), transition to 1.5 units
+     simultaneously with the zoom so edges appear correct at D3Graph scale. */
   .hero-edge {
     stroke-opacity: 1;
-    stroke-width: 1.2;
-    vector-effect: non-scaling-stroke;
-    transition: stroke-opacity 0.35s ease;
+    stroke-width: 7;
+    transition: stroke-width 1.4s cubic-bezier(0.15, 0, 0.4, 1),
+                stroke-opacity 0.35s ease;
+  }
+  .hero-tile.hero-zooming .hero-edge {
+    stroke-width: 1.5;
   }
 
   .hero-node {
-    fill:         var(--mini-node-fill,   #ccc);
-    stroke:       var(--mini-node-stroke, #666);
+    fill:         #fff;
+    stroke:       rgba(255, 255, 255, 0.4);
     stroke-width: 1.5;
   }
 

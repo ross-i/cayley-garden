@@ -1,6 +1,8 @@
 <script>
   import { graphHighlight } from './animState.js';
 
+  export let visible = false;
+
   const NODES = [
     { id: '0,1,2', label: 'e',   x: 250, y:  68 },
     { id: '2,0,1', label: 'r',   x: 440, y: 432 },
@@ -43,7 +45,7 @@
   $: anyHighlight = hlNodes.size > 0 || hlEdges.size > 0;
 </script>
 
-<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+<svg class:visible viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <!-- filterUnits="userSpaceOnUse" prevents the filter region from collapsing
          to zero on axis-aligned edges (which have a zero-width or zero-height
@@ -82,6 +84,7 @@
         x2={ep.x2}
         y2={ep.y2}
         stroke={GEN_COLORS[edge.gen]}
+        marker-start={edge.gen === 1 ? `url(#arrow-${edge.gen})` : null}
         marker-end="url(#arrow-{edge.gen})"
         filter={anyHighlight && hlEdges.has(edge.id) ? 'url(#glow)' : null}
       />
@@ -114,6 +117,11 @@
     display: block;
     width: 100%;
     height: 100%;
+    opacity: 0;
+    transition: opacity 0.75s ease;
+  }
+  svg.visible {
+    opacity: 1;
   }
 
   /* Edge states */
@@ -132,13 +140,13 @@
 
   /* Node circle states */
   .node circle {
-    fill: rgba(255, 255, 255, 0.12);
+    fill: #fff;
     stroke: rgba(255, 255, 255, 0.4);
     stroke-width: 1.5;
     transition: fill 0.2s, stroke 0.2s, opacity 0.2s;
   }
   .node.highlighted circle {
-    fill: #fff;
+    fill: #eee;
     stroke: #fff;
     stroke-width: 2;
   }
@@ -148,7 +156,7 @@
 
   /* Node label states */
   .node text {
-    fill: white;
+    fill: #111;
     pointer-events: none;
     user-select: none;
     transition: fill 0.2s;

@@ -2,9 +2,6 @@
   import { triangleState } from './animState.js';
 
   $: rotDeg = $triangleState.rotation;
-
-  // Flip animation: re-key the inner group whenever flipTick increments so the
-  // CSS animation restarts from scratch each time the flip is triggered.
   $: flipTick = $triangleState.flipTick;
 </script>
 
@@ -23,13 +20,18 @@
     {#key flipTick}
       <g class="flip-group" class:do-flip={flipTick > 0}>
         <polygon class="tri-poly" points="250,64 440,393 60,393"/>
-        <g class="vertex-labels" class:labels-visible={$triangleState.labeled}>
-          <text x="250" y="36" class="vlabel">1</text>
-          <text x="468" y="393" class="vlabel">2</text>
-          <text x="32" y="393" class="vlabel">3</text>
-        </g>
       </g>
     {/key}
+
+    <!-- Labels live outside the flip-group so scaleX never squishes or mirrors
+         them. They stay inside the rotating group so they translate with their
+         vertices. Each label counter-rotates by -rotDeg (same easing as the
+         outer group) so the text always reads upright. -->
+    <g class="vertex-labels" class:labels-visible={$triangleState.labeled}>
+      <text x="250" y="36"  class="vlabel" style="--cr:{-rotDeg}deg">1</text>
+      <text x="468" y="393" class="vlabel" style="--cr:{-rotDeg}deg">2</text>
+      <text x="32"  y="393" class="vlabel" style="--cr:{-rotDeg}deg">3</text>
+    </g>
   </g>
 </svg>
 
@@ -101,5 +103,9 @@
     fill: rgba(255, 255, 255, 0.85);
     text-anchor: middle;
     dominant-baseline: central;
+    transform: rotate(var(--cr, 0deg));
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    transition: transform 0.6s ease-in-out;
   }
 </style>

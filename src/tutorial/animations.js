@@ -112,9 +112,9 @@ export const animations = {
     // 3.) show axis through lower right vertex and flip over it
     triangleState.update(s => ({
       ...s,
-      rotation: 120,
+      // rotation: 120,
       showAxis: true,
-      flipTick: s.flipTick + 1,
+      // flipTick: s.flipTick + 1,
     }));
   },
 

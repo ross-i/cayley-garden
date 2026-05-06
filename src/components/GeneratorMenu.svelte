@@ -108,10 +108,33 @@
 {#if $n}
   <div class="generator-menu">
 
-    <!-- Selected generators with color swatches (and name inputs if useNames) -->
-    <div class="selected-generators">
-      <h3>Selected generators</h3>
-      {#if $generators.length > 0}
+    <h3>Select generators:</h3>
+    <!-- Top half: cycle-structure dropdowns -->
+    <div class="groups-section">
+      {#each groups as group}
+        <details>
+          <summary>{group.label}</summary>
+          <div class="perm-list" class:two-col={group.perms.length >= 4}>
+            {#each (group.perms.length >= 4 ? colMajor2(group.perms) : group.perms) as perm}
+              <label>
+                <input
+                  type="checkbox"
+                  checked={selectedKeys.has(toKey(perm))}
+                  disabled={!selectedKeys.has(toKey(perm)) && $generators.length >= MAX_GENERATORS}
+                  on:change={(e) => toggleGenerator(perm, e.target.checked)}
+                />
+                {toCycleNotation(perm)}
+              </label>
+            {/each}
+          </div>
+        </details>
+      {/each}
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Bottom half: selected generators, controls, name toggle -->
+    <div class="selected-section">
       {#each $generators as perm, i}
         <div class="generator-row">
           <input
@@ -132,56 +155,63 @@
           <button class="remove-btn" on:click={() => toggleGenerator(perm, false)} title="Remove">✕</button>
         </div>
       {/each}
-      {/if}
     </div>
 
-    {#if $generators.length >= 6}
-      <button class="deselect-all-btn" on:click={deselectAll}>
+    <div class="selected-gens-options">
+      <button class="deselect-all-btn" on:click={deselectAll} class:hidden={$generators.length<1}>
         Deselect all generators
       </button>
-    {/if}
-
-    <!-- Name-mode toggle -->
-    <label class="name-toggle">
-      <input type="checkbox" bind:checked={$useNames} />
-      Assign generator names
-    </label>
-
-    <!-- Nested generator list grouped by cycle structure -->
-    {#each groups as group}
-      <details>
-        <summary>{group.label}</summary>
-        <div class="perm-list" class:two-col={group.perms.length >= 4}>
-          {#each (group.perms.length >= 4 ? colMajor2(group.perms) : group.perms) as perm}
-            <label>
-              <input
-                type="checkbox"
-                checked={selectedKeys.has(toKey(perm))}
-                disabled={!selectedKeys.has(toKey(perm)) && $generators.length >= MAX_GENERATORS}
-                on:change={(e) => toggleGenerator(perm, e.target.checked)}
-              />
-              {toCycleNotation(perm)}
-            </label>
-          {/each}
-        </div>
-      </details>
-    {/each}
+      {#if $generators.length >= 1}
+        <label class="name-toggle">
+          <input type="checkbox" bind:checked={$useNames} />
+          Assign generator names
+        </label>
+      {/if}
+    </div>
 
   </div>
 {/if}
 
 <style>
+   h3 {
+    margin: 0 0 0rem;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
   .generator-menu {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    height: 100%;
     text-align: left;
     width: 100%;
   }
-  .selected-generators {
+  .groups-section {
+    flex: 1;
+    min-height: 20.3rem;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    padding-top: 0.2rem;
+  }
+  .selected-section {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.25rem;
+    padding-bottom: 0.5rem;
+  }
+  .selected-gens-options {
+    padding-top: 0.2rem;
+    min-height: 2.9rem;
+  }
+  .divider {
+    flex-shrink: 0;
+    margin: 0.5rem;
+    border: none;
+    border-top: 0px solid var(--border, #ccc);
   }
   .generator-row {
     display: flex;
@@ -222,11 +252,15 @@
     align-self: flex-start;
     font-size: 0.8rem;
     padding: 0.2em 0.6em;
+    margin-bottom: 0.15em;
     color: #888;
     background: none;
     border: 1px solid #bbb;
     border-radius: 4px;
     cursor: pointer;
+  }
+  .deselect-all-btn.hidden {
+    visibility: hidden;
   }
   .deselect-all-btn:hover {
     color: #e15759;

@@ -54,7 +54,11 @@ export const allEdges = writable(new Map());
 export const isStable = writable(false);
 
 // Top-level view: which screen is the user on.
-export const appView = writable('landing'); // 'landing' | 'tutorial' | 'app'
+export const appView = writable('landing'); // 'landing' | 'transitioning' | 'tutorial' | 'app'
+
+// Set true once D3Graph should start fading in — fires before LandingPage unmounts
+// so D3Graph becomes opaque while the zoomed hero tile is still underneath it.
+export const d3Visible = writable(false);
 
 // ── Derived stores ───────────────────────────────────────────────
 

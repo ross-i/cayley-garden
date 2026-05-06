@@ -94,28 +94,26 @@
     <button on:click={handleGenerate} disabled={noGenerators}>
       Generate
     </button>
-    <button on:click={handleStepForward} disabled={noGenerators || $isStable}>
-      Step Forward
-    </button>
+    <!-- <button on:click={handleStepForward} disabled={noGenerators || $isStable}> -->
+    <!--   Step Forward -->
+    <!-- </button> -->
     <button on:click={handleReset}>
       Reset
     </button>
   </div>
 
-  {#if hasFrames}
-    <div class="slider-row">
-      <label for="frame-slider">Step:</label>
-      <input
-        id="frame-slider"
-        type="range"
-        min="0"
-        max={$frames.length - 1}
-        bind:value={$currentFrame}
-        on:change={() => viewBoxFitSignal.update(s => s + 1)}
-      />
-      <span>{$currentFrame} / {$frames.length - 1}</span>
-    </div>
-  {/if}
+  <div class="slider-row" class:hidden={!hasFrames}>
+    <label for="frame-slider">Step:</label>
+    <input
+      id="frame-slider"
+      type="range"
+      min="0"
+      max={$frames.length - 1}
+      bind:value={$currentFrame}
+      on:change={() => viewBoxFitSignal.update(s => s + 1)}
+    />
+    <span>{$currentFrame} / {$frames.length - 1}</span>
+  </div>
 
   <label class="ghost-toggle">
     <input
@@ -146,6 +144,9 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+  .slider-row.hidden {
+    visibility: hidden;
   }
   .slider-row input {
     flex: 1;

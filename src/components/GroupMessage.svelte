@@ -11,15 +11,16 @@
     : '';
 </script>
 
-{#if $generationComplete}
-  <div class="group-message">
-    You generated <strong>{groupName}</strong>
-  </div>
-{/if}
+<div class="group-message" class:hidden={!$generationComplete}>
+  You generated <strong>{groupName}</strong>
+</div>
 
 <style>
   .group-message {
     font-size: 1.15rem;
     padding: 0.5rem 0;
+  }
+  .group-message.hidden {
+    visibility: hidden;
   }
 </style>

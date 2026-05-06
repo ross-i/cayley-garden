@@ -18,7 +18,6 @@
 //                 Value is the column: 'left' | 'center' | 'right'
 //                 Any component not listed is hidden.
 //   animation     string key for the animation that runs on stage enter
-//                 (all null for now — wired up later)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const stages = [
@@ -26,8 +25,8 @@ export const stages = [
   // ── 0 ─ Opening ────────────────────────────────────────────────────────────
   {
     id: 'opening',
-    copy: 'Scroll to explore.',
-    copyPosition: { x: 'left', y: 'middle' },
+    copy: 'Welcome to the garden, where from humble seeds sprout mighty graphs, proudly displaying the beauty of symmetry.\nScroll or use the arrow keys to learn more.',
+    copyPosition: { x: 'center', y: 'bottom' },
     show: { graph: 'center' },
     animation: null,
   },
@@ -35,19 +34,10 @@ export const stages = [
   // ── 1 ─ Arthur Cayley portrait slides in from the right ────────────────────
   {
     id: 'portrait-in',
-    copy: 'A Cayley Graph, named after Arthur Cayley, encodes the abstract structure of a group.',
+    copy: 'A Cayley graph, named after Arthur Cayley, encodes the abstract structure of a group.',
     copyPosition: { x: 'left', y: 'middle' },
     show: { graph: 'center', portrait: 'right' },
     animation: 'portraitSlideIn',   // portrait enters from right; graph shifts left
-  },
-
-  // ── 2 ─ Portrait slides off to the right ───────────────────────────────────
-  {
-    id: 'portrait-out',
-    copy: null,
-    copyPosition: { x: 'left', y: 'middle' },
-    show: { graph: 'center' },
-    animation: 'portraitSlideOut',  // portrait exits right; graph recenters
   },
 
   // ── 3 ─ Nodes and edges ─────────────────────────────────────────────────────
@@ -59,6 +49,8 @@ export const stages = [
     animation: 'highlightAllNodes',   // all 6 nodes glow to show "these are the elements"
   },
 
+
+  // ── 4 ─ Generators 1 ─────────────────────────────────────────────────────
   {
     id: 'generators-intro-1',
     copy: 'The edges represent the action of one element on another.',
@@ -66,7 +58,7 @@ export const stages = [
     show: { graph: 'center' },
     animation: 'highlightGeneratorEdges',  // r-edges (blue) and f-edges (red) lit up
   },
-  // ── 4 ─ Generators ──────────────────────────────────────────────────────────
+  // ── 4 ─ Generators 2 ──────────────────────────────────────────────────────────
   {
     id: 'generators-intro-2',
     copy: 'Here, we are letting only a subset of elements "act" on the others: we have chosen as generators the elements f (red edges) and r (blue edges).',
@@ -87,8 +79,8 @@ export const stages = [
   // ── 6 ─ Triangle slides in from the left ────────────────────────────────────
   {
     id: 'triangle-in',
-    copy: 'D₃ is the dihedral group of symmetries of an equilateral triangle.',
-    copyPosition: { x: 'right', y: 'middle' },
+    copy: 'This is the Cayley graph of the dihedral group D₃, which captures the symmetries of an equilateral triangle.',
+    copyPosition: { x: 'center', y: 'bottom' },
     show: { triangle: 'left', graph: 'center' },
     animation: 'triangleSlideIn',   // triangle enters from left; graph stays centered
   },
@@ -97,7 +89,7 @@ export const stages = [
   {
     id: 'identity',
     copy: 'e is the identity element — the "do-nothing" symmetry. If we do nothing to the triangle, it looks the same!',
-    copyPosition: { x: 'right', y: 'middle' },
+    copyPosition: { x: 'center', y: 'bottom' },
     show: { triangle: 'left', graph: 'center' },
     animation: 'highlightE',        // highlight node e on graph
   },
@@ -106,7 +98,7 @@ export const stages = [
   {
     id: 'flip',
     copy: 'f represents the "flip" — if we reflect the triangle about the vertical axis, it still looks the same!',
-    copyPosition: { x: 'right', y: 'middle' },
+    copyPosition: { x: 'center', y: 'bottom' },
     show: { triangle: 'left', graph: 'center' },
     animation: 'highlightF',        // highlight node f; show red axis on triangle; animate reflection
   },
@@ -115,7 +107,7 @@ export const stages = [
   {
     id: 'rotation',
     copy: 'r represents rotation — if we rotate the triangle by 120°, it still looks the same!',
-    copyPosition: { x: 'right', y: 'middle' },
+    copyPosition: { x: 'center', y: 'bottom' },
     show: { triangle: 'left', graph: 'center' },
     animation: 'highlightR',        // highlight node r; animate triangle rotating 120° CW
   },
@@ -124,7 +116,7 @@ export const stages = [
   {
     id: 'composing',
     copy: 'By composing these actions, we can create all possible symmetries of the triangle — we can generate the dihedral group.',
-    copyPosition: { x: 'right', y: 'middle' },
+    copyPosition: { x: 'center', y: 'bottom' },
     show: { triangle: 'left', graph: 'center' },
     animation: null,
   },
@@ -133,7 +125,7 @@ export const stages = [
   {
     id: 'rf-path',
     copy: 'For example, flipping over the vertical axis and then rotating by 120° is the same as flipping over the axis through the lower-right vertex — even though that action isn\'t one of our generators.',
-    copyPosition: { x: 'right', y: 'middle' },
+    copyPosition: { x: 'center', y: 'bottom' },
     show: { triangle: 'left', graph: 'center' },
     animation: 'highlightRFPath',   // trace path e → f → rf on graph; animate on triangle
   },
@@ -141,8 +133,8 @@ export const stages = [
   // ── 12 ─ Cayley table slides in from the right ─────────────────────────────
   {
     id: 'table-in',
-    copy: 'The Cayley table (can you guess its namesake?) is like a multiplication table for a group. The row element acts on the column element.',
-    copyPosition: { x: 'center', y: 'bottom' },
+    copy: 'The Cayley table is like a multiplication table for a group. The row element acts on the column element.',
+    copyPosition: { x: 'right', y: 'bottom' },
     show: { triangle: 'left', graph: 'center', table: 'right' },
     animation: 'tableSlideIn',      // table enters from right
   },
@@ -150,8 +142,8 @@ export const stages = [
   // ── 13 ─ rf in the table ────────────────────────────────────────────────────
   {
     id: 'rf-table',
-    copy: 'Thus, r and f give rf.',
-    copyPosition: { x: 'center', y: 'bottom' },
+    copy: 'Thus, r acts on f to give rf.',
+    copyPosition: { x: 'right', y: 'bottom' },
     show: { triangle: 'left', graph: 'center', table: 'right' },
     animation: 'highlightTableRF',  // highlight row r, column f, cell rf
   },
@@ -159,8 +151,8 @@ export const stages = [
   // ── 14 ─ Non-abelian ────────────────────────────────────────────────────────
   {
     id: 'nonabelian',
-    copy: 'The dihedral group is non-Abelian — order matters. f and r give r²f, not rf. Can you see that rotating 120° and then flipping is the same as flipping and then rotating 240°?',
-    copyPosition: { x: 'center', y: 'bottom' },
+    copy: 'The dihedral group is non-Abelian — order matters. f acting on r gives r²f, which does not equal rf. Can you see that rotating 120° and then flipping is the same as flipping and then rotating 240°?',
+    copyPosition: { x: 'right', y: 'bottom' },
     show: { triangle: 'left', graph: 'center', table: 'right' },
     animation: 'highlightTableR2F', // highlight row f, column r, cell r²f
   },
@@ -168,7 +160,7 @@ export const stages = [
   // ── 15 ─ Many more groups ───────────────────────────────────────────────────
   {
     id: 'more-groups',
-    copy: 'Of course, there are many more groups than just the dihedral groups — there are lots of symmetries that can be described by groups.',
+    copy: 'Of course, there are many more families of groups than just the dihedral groups — there are lots of symmetries that can be described by groups.',
     copyPosition: { x: 'center', y: 'bottom' },
     show: { triangle: 'left', graph: 'center', table: 'right' },
     animation: null,
@@ -186,7 +178,7 @@ export const stages = [
   // ── 17 ─ Four balls appear ──────────────────────────────────────────────────
   {
     id: 'balls-intro',
-    copy: 'How many ways are there to order four objects?\nWe might think about the actions we could take: swap two elements, make a pair of swaps, or cycle 3 or 4 elements at a time.',
+    copy: 'How many ways are there to order four objects?\nConsider the actions we could take: swap two elements, make a pair of swaps, or cycle 3 or 4 elements at a time.',
     copyPosition: { x: 'center', y: 'bottom' },
     show: { balls: 'center' },
     animation: 'ballsAppear',
@@ -204,7 +196,7 @@ export const stages = [
   // ── 19 ─ 3-cycle (1 2 3) ────────────────────────────────────────────────────
   {
     id: 'cycle',
-    copy: 'A 3-cycle like (1 2 3) cycles three elements. This notation is called "cycle notation".',
+    copy: 'A 3-cycle like (1 2 3) cycles three elements.',
     copyPosition: { x: 'center', y: 'bottom' },
     show: { balls: 'center' },
     animation: 'ballCycle123',      // animate balls 1, 2, 3 cycling, then return
@@ -213,9 +205,9 @@ export const stages = [
   // ── 20 ─ S₄ Cayley graph ────────────────────────────────────────────────────
   {
     id: 's4-graph',
-    copy: 'These actions also form a group: the symmetric group S₄. It has 4! = 24 elements. The Cayley graph here is generated by the swaps (1 2), (1 3), and (2 4).',
-    copyPosition: { x: 'center', y: 'bottom' },
-    show: { s4graph: 'center' },
+    copy: 'These actions also form a group: the symmetric group S₄. It has 4! = 24 elements. The Cayley graph here is generated by (1 2) and (1 3 4).',
+    copyPosition: { x: 'center', y: 'middle' },
+    show: { balls: 'left', s4graph: 'right' },
     animation: 's4GraphReveal',
   },
 
@@ -223,17 +215,17 @@ export const stages = [
   {
     id: 'permutation-groups',
     copy: 'Any subgroup of a symmetric group is called a permutation group. It contains some, but not necessarily all, of the permutations.',
-    copyPosition: { x: 'center', y: 'bottom' },
-    show: { s4graph: 'center' },
+    copyPosition: { x: 'center', y: 'middle' },
+    show: { balls: 'left', s4graph: 'right' },
     animation: null,
   },
 
   // ── 22 ─ Cayley's theorem ───────────────────────────────────────────────────
   {
     id: 'cayleys-theorem',
-    copy: 'Cayley\'s theorem states that every group is isomorphic to some permutation group.',
+    copy: 'According to Cayley\'s theorem, every group is isomorphic to some permutation group.',
     copyPosition: { x: 'center', y: 'middle' },
-    show: { s4graph: 'center' },
+    show: null,
     animation: null,
   },
 
@@ -242,25 +234,25 @@ export const stages = [
     id: 'labeled-triangle',
     copy: 'For example, we can realize D₃ as a permutation group simply by labeling the vertices of the triangle.',
     copyPosition: { x: 'center', y: 'bottom' },
-    show: { triangle: 'left', s4graph: 'right' },
+    show: { triangle: 'center' },
     animation: 'labeledTriangleIn', // triangle reappears with vertex labels 1, 2, 3
   },
 
   // ── 24 ─ Labeled flip ───────────────────────────────────────────────────────
   {
     id: 'labeled-flip',
-    copy: 'A flip across the vertical axis is (2 3): it swaps vertices 2 and 3, leaving vertex 1 alone.',
+    copy: 'A flip across the vertical axis is (2 3):\nit swaps vertices 2 and 3, leaving vertex 1 alone.',
     copyPosition: { x: 'center', y: 'bottom' },
-    show: { triangle: 'left' },
+    show: { triangle: 'center' },
     animation: 'labeledFlipAxis',   // draw vertical axis on labeled triangle
   },
 
   // ── 25 ─ Labeled rotation ───────────────────────────────────────────────────
   {
     id: 'labeled-rotation',
-    copy: 'A rotation is the cycle (1 2 3): it sends 1 → 2, 2 → 3, and 3 → 1.',
+    copy: 'A rotation is the cycle (1 2 3):\nit sends 1 → 2, 2 → 3, and 3 → 1.',
     copyPosition: { x: 'center', y: 'bottom' },
-    show: { triangle: 'left' },
+    show: { triangle: 'center' },
     animation: 'labeledRotation',   // animate labeled triangle rotating 120° CW
   },
 
@@ -269,7 +261,7 @@ export const stages = [
     id: 'generators-close',
     copy: 'Thus, by choosing the right generators from among the elements of a symmetric group, we can generate any group.',
     copyPosition: { x: 'center', y: 'bottom' },
-    show: { triangle: 'left' },
+    show: { triangle: 'center' },
     animation: null,
   },
 
@@ -288,16 +280,7 @@ export const stages = [
     copy: 'Can you discover every subgroup?',
     copyPosition: { x: 'center', y: 'middle' },
     show: {},
-    animation: null,
-  },
-
-  // ── 29 ─ Launch app ─────────────────────────────────────────────────────────
-  {
-    id: 'finish',
-    copy: null,
-    copyPosition: { x: 'center', y: 'middle' },
-    show: {},
-    animation: null,                 // scroll trigger in handleScroll fires the app transition
+    animation: null, // scroll trigger in handleScroll fires the app transition
   },
 
 ];
