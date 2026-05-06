@@ -1,5 +1,7 @@
 # Cayley's Garden
 
+[Try it out!](http://cayley.surge.sh/)
+
 **Cayley's Theorem:** every group $G$ is isomorphic
 to a subgroup of $\mathbb{S}_g$, the symmetric group
 on $g$ elements, where $g = |G|$, the order of $G$.
