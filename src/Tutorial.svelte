@@ -213,10 +213,10 @@
   }
   .tutorial::-webkit-scrollbar { display: none; } /* Chrome/Safari/Edge */
 
-  :global(html[data-theme="light"]) .tutorial {
-    background: #f0f0f0;
-    color: #1a1a1a;
-  }
+  /* :global(html[data-theme="light"]) .tutorial { */
+  /*   background: #f0f0f0; */
+  /*   color: #1a1a1a; */
+  /* } */
 
   /* ── Sticky visual stage ────────────────────────────────────────────────── */
   .visual-stage {
@@ -323,10 +323,10 @@
     pointer-events: none;
   }
 
-  :global(html[data-theme="light"]) .copy-bubble {
-    background: rgba(255, 255, 255, 0.88);
-    border-color: rgba(0, 0, 0, 0.12);
-  }
+  /* :global(html[data-theme="light"]) .copy-bubble { */
+  /*   background: rgba(255, 255, 255, 0.88); */
+  /*   border-color: rgba(0, 0, 0, 0.12); */
+  /* } */
 
   .copy-bubble p {
     margin: 0;
@@ -424,23 +424,23 @@
     border-color: rgba(255, 255, 255, 0.5) !important;
   }
 
-  :global(html[data-theme="light"]) .skip-btn {
-    border-color: rgba(0,0,0,0.2) !important;
-    color: rgba(0,0,0,0.4) !important;
-  }
-  :global(html[data-theme="light"]) .skip-btn:hover {
-    color: rgba(0,0,0,0.75) !important;
-    border-color: rgba(0,0,0,0.5) !important;
-  }
+  /* :global(html[data-theme="light"]) .skip-btn { */
+  /*   border-color: rgba(0,0,0,0.2) !important; */
+  /*   color: rgba(0,0,0,0.4) !important; */
+  /* } */
+  /* :global(html[data-theme="light"]) .skip-btn:hover { */
+  /*   color: rgba(0,0,0,0.75) !important; */
+  /*   border-color: rgba(0,0,0,0.5) !important; */
+  /* } */
 
   /* ── Dev label ──────────────────────────────────────────────────────────── */
-  .dev-label {
-    position: absolute;
-    top: 1.25rem;
-    left: 1.5rem;
-    font-size: 0.7rem;
-    opacity: 0.25;
-    font-family: monospace;
-    pointer-events: none;
-  }
+  /* .dev-label { */
+  /*   position: absolute; */
+  /*   top: 1.25rem; */
+  /*   left: 1.5rem; */
+  /*   font-size: 0.7rem; */
+  /*   opacity: 0.25; */
+  /*   font-family: monospace; */
+  /*   pointer-events: none; */
+  /* } */
 </style>

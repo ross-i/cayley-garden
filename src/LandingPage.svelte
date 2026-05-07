@@ -291,24 +291,24 @@
     --title-color: rgba(255,255,255,0.92);
   }
 
-  @media (prefers-color-scheme: light) {
-    .landing {
-      background: #f0f0f0;
-      --mini-node-fill:   #555;
-      --mini-node-stroke: #aaa;
-      --title-color: #1a1a1a;
-    }
-  }
-  :global(html[data-theme="dark"])  .landing {
-    background: #111;
-    --mini-node-fill: #ccc; --mini-node-stroke: #666;
-    --title-color: rgba(255,255,255,0.92);
-  }
-  :global(html[data-theme="light"]) .landing {
-    background: #f0f0f0;
-    --mini-node-fill: #555; --mini-node-stroke: #aaa;
-    --title-color: #1a1a1a;
-  }
+  /* @media (prefers-color-scheme: light) { */
+  /*   .landing { */
+  /*     background: #f0f0f0; */
+  /*     --mini-node-fill:   #555; */
+  /*     --mini-node-stroke: #aaa; */
+  /*     --title-color: #1a1a1a; */
+  /*   } */
+  /* } */
+  /* :global(html[data-theme="dark"])  .landing { */
+  /*   background: #111; */
+  /*   --mini-node-fill: #ccc; --mini-node-stroke: #666; */
+  /*   --title-color: rgba(255,255,255,0.92); */
+  /* } */
+  /* :global(html[data-theme="light"]) .landing { */
+  /*   background: #f0f0f0; */
+  /*   --mini-node-fill: #555; --mini-node-stroke: #aaa; */
+  /*   --title-color: #1a1a1a; */
+  /* } */
 
   /* ── Background grid ─────────────────────────────────────────────── */
   .bg-grid {
@@ -461,12 +461,12 @@
     pointer-events: none;
   }
 
-  :global(html[data-theme="light"]) .skip-btn {
-    color: #666 !important;
-    border-color: #aaa !important;
-  }
-  :global(html[data-theme="light"]) .skip-btn:hover {
-    color: #222 !important;
-    border-color: #555 !important;
-  }
+  /* :global(html[data-theme="light"]) .skip-btn { */
+  /*   color: #666 !important; */
+  /*   border-color: #aaa !important; */
+  /* } */
+  /* :global(html[data-theme="light"]) .skip-btn:hover { */
+  /*   color: #222 !important; */
+  /*   border-color: #555 !important; */
+  /* } */
 </style>
